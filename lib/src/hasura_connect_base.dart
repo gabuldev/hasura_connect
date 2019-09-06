@@ -11,7 +11,7 @@ import 'snapshot.dart';
 class HasuraConnect {
   final _controller = StreamController.broadcast();
   final Map<String, Snapshot> _snapmap = {};
-  final Map<String, String> headers;
+  Map<String, String> headers;
 
   WebSocket _channelPromisse;
   bool _isDisconnected = false;
@@ -32,16 +32,20 @@ class HasuraConnect {
   };
 
   String get ramdomKey {
-    var rand = new Random();
-    var codeUnits = new List.generate(8, (index) {
+    var rand =  Random();
+    var codeUnits = List.generate(8, (index) {
       return rand.nextInt(33) + 89;
     });
 
-    return new String.fromCharCodes(codeUnits);
+    return String.fromCharCodes(codeUnits);
   }
 
   void addHeader(String key, String value) {
-    headers[key] = value;
+    if(headers.isEmpty){
+      headers = {key:value};
+    }else if (!headers.containsKey(key)){
+      headers[key] = value;
+    }
   }
 
   void removeHeader(String key) {
@@ -302,10 +306,10 @@ class HasuraConnect {
   //   Map json = jsonDecode(value);
 
   //   if (json.containsKey("errors")) {
-  //     throw HasuraError.fromJson(json["errors"][0]);
   //   }
   //   return json;
-  // }
+  // }     throw HasuraError.fromJson(json["errors"][0]);
+  //
 
   void dispose() {
     _disconnect();

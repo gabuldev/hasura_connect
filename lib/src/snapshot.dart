@@ -17,14 +17,13 @@ class Snapshot<T> {
   StreamController<T> _controller;
   final Stream<T> _streamInit;
 
-  Stream<T> get stream => _controller.stream
-        .transform(StartWithStreamTransformer(value))
-        .where((v) => value != null);
+  Stream<T>  stream;
 
   Snapshot(this.key, this.query, this.variables, this._streamInit, this._close,
       this._renew,
       {StreamController<T> controllerTest, HasuraConnect conn, this.value}) {
     _conn = conn;
+
 
     if (controllerTest == null) {
       _controller = StreamController<T>.broadcast();
@@ -32,10 +31,16 @@ class Snapshot<T> {
       _controller = controllerTest;
     }
 
+     stream = _controller.stream
+        .transform(StartWithStreamTransformer(value))
+        .where((v) => value != null);
+
     _streamInit
         .listen((data) {
           value = data;
+          if(!_controller.isClosed){
           _controller.add(data);
+          }
         });
   }
 
